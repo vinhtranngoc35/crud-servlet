@@ -13,23 +13,26 @@
 </head>
 <body>
 <h1>${action}</h1>
-<a href="/customers?action=add">Create Customer</a>
+<a href="/customers?action=create">Create Customer</a>
+<c:if test="${requestScope['customers'].size() != 0}">
 <table border="1">
     <tr>
-        <td>Id</td>
+        <td>Id</td>e
         <td>Name</td>
         <td>Email</td>
         <td>Action</td>
     </tr>
-    <c:forEach items="${demo}" var="customer">
+    <c:forEach items="${customers}" var="customer">
         <tr>
             <td>${customer.id}</td>
             <td>${customer.name}</td>
             <td>${customer.email}</td>
             <td><a href="/customers?action=edit&id=${customer.id}">Edit</a> </td>
+            <td><a href="/customers?action=delete&id=${customer.id}" onclick="return confirm('Do you want to remove ${customer.name}?')">Delete</a> </td>
         </tr>
     </c:forEach>
 </table>
+</c:if>
 
 </body>
 </html>

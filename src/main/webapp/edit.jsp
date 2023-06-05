@@ -15,6 +15,7 @@
 <c:if test="${requestScope['message'] != null}">
   <span>${message}</span>
 </c:if>
+<a href="/customers">Back</a>
 <form action="/customers?action=edit" method="post">
   <input type="hidden" name="id" value="${customer.id}">
   <label for="name">Name</label>

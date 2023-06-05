@@ -11,7 +11,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.*;
 import javax.servlet.annotation.*;
 
-@WebServlet(name = "helloServlet", value = "/customers")
+@WebServlet(name = "helloServlet", value = "/hello")
 public class HelloServlet extends HttpServlet {
     private String message;
 
@@ -38,6 +38,9 @@ public class HelloServlet extends HttpServlet {
                break;
            case"edit":
                showEditCustomer(request,response);
+               break;
+           case "delete":
+               delete(request,response);
                break;
            default:
                showCustomers(request,response);
@@ -66,8 +69,36 @@ public class HelloServlet extends HttpServlet {
                createCustomer(req,resp);
                break;
            case"edit":
+               editCustomer(req,resp);
+               break;
 
        }
+    }
+
+    private void editCustomer(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        int id = Integer.parseInt(req.getParameter("id"));
+        String name = req.getParameter("name");
+        String email = req.getParameter("email");
+        for (Customer customer:customers) {
+            if (customer.getId() == id){
+                customer.setName(name);
+                customer.setEmail(email);
+                break;
+            }
+        }
+        message = "sửa thành công";
+        req.setAttribute("message",message);
+        showCustomers(req,resp);
+    }
+
+    private  void delete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        int id = Integer.parseInt(req.getParameter("id"));
+
+        customers = customers
+                .stream().filter(e ->e.getId() != id)
+                .collect(Collectors.toList());
+
+        showCustomers(req,resp);
     }
 
     public void showCustomers(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
