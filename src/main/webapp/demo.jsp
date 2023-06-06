@@ -17,9 +17,10 @@
 <c:if test="${requestScope['customers'].size() != 0}">
 <table border="1">
     <tr>
-        <td>Id</td>e
+        <td>Id</td>
         <td>Name</td>
         <td>Email</td>
+        <td>Role</td>
         <td>Action</td>
     </tr>
     <c:forEach items="${customers}" var="customer">
@@ -27,6 +28,7 @@
             <td>${customer.id}</td>
             <td>${customer.name}</td>
             <td>${customer.email}</td>
+            <td>${customer.role.name}</td>
             <td><a href="/customers?action=edit&id=${customer.id}">Edit</a> </td>
             <td><a href="/customers?action=delete&id=${customer.id}" onclick="return confirm('Do you want to remove ${customer.name}?')">Delete</a> </td>
         </tr>

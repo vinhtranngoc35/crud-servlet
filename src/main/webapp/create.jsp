@@ -18,9 +18,18 @@
   <a href="/customers">Back</a>
   <form action="/customers?action=create" method="post">
     <label for="name">Name</label>
-    <input type="text" name="name" id="name" />
+    <input type="text" name="name" id="name" value="${customer.name}" />
     <label for="email">Email</label>
-    <input type="text" name="email" id="email" />
+    <input type="text" name="email" id="email" value="${customer.email}" />
+    <label for="role">Role</label>
+
+    <select name="role" id="role" value="${customer.role.id}">
+      <option value="">--None--</option>
+      <c:forEach items="${roles}" var="role">
+        <option value="${role.id}">${role.name}</option>
+      </c:forEach>
+    </select>
+
     <button type="submit">Create</button>
   </form>
 </body>

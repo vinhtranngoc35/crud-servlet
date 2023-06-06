@@ -1,7 +1,9 @@
 package com.example.demo6.controller;
 
 import com.example.demo6.model.Customer;
+import com.example.demo6.model.Role;
 import com.example.demo6.service.CustomerService;
+import com.example.demo6.service.RoleService;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -14,6 +16,7 @@ import java.io.IOException;
 public class CustomerServlet extends HttpServlet {
 
     private CustomerService customerService = new CustomerService();
+    private RoleService roleService = new RoleService();
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -37,9 +40,12 @@ public class CustomerServlet extends HttpServlet {
         int id = Integer.parseInt(req.getParameter("id"));
         String name = req.getParameter("name");
         String email = req.getParameter("email");
-        Customer customer = new Customer(id,name,email);
+        int roleId = Integer.parseInt(req.getParameter("role"));
+        Role role = roleService.findById(roleId);
+        Customer customer = new Customer(id,name,email, role);
         customerService.update(customer);
         req.setAttribute("customer",customer);
+        req.setAttribute("roles", roleService.findAll());
         req.setAttribute("message", "edited");
         req.getRequestDispatcher("edit.jsp").forward(req,resp);
     }
@@ -48,8 +54,13 @@ public class CustomerServlet extends HttpServlet {
     private void createCustomer(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String name = req.getParameter("name");
         String mail = req.getParameter("email");
-        customerService.create(new Customer(name, mail));
+        int roleId = Integer.parseInt(req.getParameter("role"));
+        Role role = roleService.findById(roleId);
+        Customer customer = new Customer(name, mail, role);
+        customerService.create(customer);
+        req.setAttribute("customer", customer);
         req.setAttribute("message", "Created");
+        req.setAttribute("roles", roleService.findAll());
         req.getRequestDispatcher("create.jsp").forward(req,resp);
     }
 
@@ -87,11 +98,13 @@ public class CustomerServlet extends HttpServlet {
         // điều hướng tới trang edit.jsp;
         Customer customer = customerService.findById(id);
         req.setAttribute("customer", customer);
+        req.setAttribute("roles", roleService.findAll());
         req.getRequestDispatcher("edit.jsp")
                 .forward(req, resp);
     }
 
     private void showFormCreateCustomer(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        req.setAttribute("roles", roleService.findAll());
         req.getRequestDispatcher("create.jsp")
                 .forward(req,resp);
     }
