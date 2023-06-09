@@ -14,10 +14,26 @@
 <body>
 <h1>${action}</h1>
 <a href="/customers?action=create">Create Customer</a>
+<form action="/customers" method="get">
+    <input type="search" name="search" id="search" value="${pageable.search}" onsearch="onClearSearch()" />
+    <button id="searchButton">Search</button>
+</form>
+</br>
 <c:if test="${requestScope['customers'].size() != 0}">
 <table border="1">
     <tr>
-        <td>Id</td>
+        <td>
+            <c:if test="${pageable.sortBy== 'desc'}">
+                <a href="/customers?page=${pageable.page}&search=${pageable.search}&sortby=asc&nameField=customers.id">
+                    Id
+                </a>
+            </c:if>
+            <c:if test="${pageable.sortBy== 'asc'}">
+                <a href="/customers?page=${pageable.page}&search=${pageable.search}&sortby=desc&nameField=customers.id">
+                    Id
+                </a>
+            </c:if>
+        </td>
         <td>Name</td>
         <td>Email</td>
         <td>Role</td>
@@ -34,7 +50,17 @@
         </tr>
     </c:forEach>
 </table>
-</c:if>
+    <ul>
+        <c:forEach begin="1" end="${pageable.totalPage}" var="page">
+            <li><a href="/customers?page=${page}&search=${pageable.search}&sortby=${pageable.sortBy}&nameField=${pageable.nameField}">${page}</a> </li>
+        </c:forEach>
 
+    </ul>
+</c:if>
+<script>
+    function onClearSearch(){
+        searchButton.click();
+    }
+</script>
 </body>
 </html>

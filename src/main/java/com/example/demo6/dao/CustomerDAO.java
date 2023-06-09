@@ -1,5 +1,6 @@
 package com.example.demo6.dao;
 
+import com.example.demo6.dto.Pageable;
 import com.example.demo6.model.Customer;
 import com.example.demo6.model.Role;
 
@@ -16,7 +17,9 @@ public class CustomerDAO {
 
     private final String SELECT_USERS = "SELECT customers.*, roles.`name` as role_name " +
             "FROM customers LEFT JOIN roles " +
-            "ON customers.role_id = roles.id;";
+            "ON customers.role_id = roles.id WHERE\n" +
+            "    lower(customers.`name`) LIKE ? OR lower(customers.email) LIKE ? \n" +
+            "        OR lower(roles.`name`) LIKE ? ORDER BY ? ?  LIMIT ? OFFSET ? ;";
     private final String SELECT_USERS_BY_ID = "SELECT customers.*, roles.`name` as role_name " +
             "FROM customers LEFT JOIN roles " +
             "ON customers.role_id = " +
@@ -29,6 +32,16 @@ public class CustomerDAO {
             "SET `name` = ?, `email` = ?, role_id = ? WHERE (`id` = ?);";
 
     private final String DELETE_USER = "DELETE FROM `customers` WHERE (`id` = ?);";
+
+    private final String TOTAL_USERS = "SELECT \n" +
+            "    COUNT(1) as total \n" +
+            "FROM\n" +
+            "    customers\n" +
+            "        LEFT JOIN\n" +
+            "    roles ON customers.role_id = roles.id\n" +
+            "WHERE\n" +
+            "    lower(customers.`name`) LIKE ? OR lower(customers.email) LIKE ?\n" +
+            "        OR lower(roles.`name`) LIKE ? ;";
 
     protected Connection getConnection() {
         Connection connection = null;
@@ -43,17 +56,44 @@ public class CustomerDAO {
         return connection;
     }
 
-    public List<Customer> findAll() {
+    private String SELECT_ALL_USERS = "SELECT \n" +
+            "    customers.*, roles.`name` as role_name \n" +
+            "FROM\n" +
+            "    customers\n" +
+            "        LEFT JOIN\n" +
+            "    roles ON customers.role_id = roles.id\n" +
+            "WHERE\n" +
+            "    lower(customers.`name`) LIKE '%s' OR lower(customers.email) LIKE '%s' \n" +
+            "        OR lower(roles.`name`) LIKE '%s' order by %s %s LIMIT %d OFFSET %d  ;\n";
+
+    public List<Customer> findAll(Pageable pageable) {
         List<Customer> customers = new ArrayList<>();
+        String search = pageable.getSearch();
+        if(search == null){
+            search = "";
+        }
+        search = "%" + search + "%";
         // Step 1: tạo 1 kết nối xuống db để gọi câu lệnh SELECT or UPDATE, Delete, vv
         try (Connection connection = getConnection();
 
              // Step 2: truyền câu lênh mình muốn chạy nằm ở trong này (SELECT_USERS)
              PreparedStatement preparedStatement = connection
-                     .prepareStatement(SELECT_USERS);) {
+                     .prepareStatement(String
+                             .format(SELECT_ALL_USERS, search, search, search,
+                                     pageable.getNameField(), pageable.getSortBy(),
+                                     pageable.getTotalItems(),(pageable.getPage() - 1) * pageable.getTotalItems()))) {
             System.out.println(preparedStatement);
+//            preparedStatement.setString(1, search);
+//            preparedStatement.setString(2, search);
+//            preparedStatement.setString(3, search);
+//            preparedStatement.setInt(6, pageable.getTotalItems());
+//            preparedStatement.setInt(7, (pageable.getPage() - 1) * pageable.getTotalItems());
+//            preparedStatement.setString(4, pageable.getNameField());
+//            preparedStatement.setString(5, pageable.getSortBy());
+
             // Step 3: tương đương vowis cái sét
             ResultSet rs = preparedStatement.executeQuery();
+
 
             // Step 4:
             //kiểm tra còn data hay không. còn thì cứ lấy bằng câu lệnh ở dưới
@@ -68,6 +108,20 @@ public class CustomerDAO {
                 int roleId = rs.getInt("role_id");
                 customers.add(new Customer(id, name, email, new Role(roleId, roleName)));
             }
+
+            // cụm lấy tổng số trang
+            PreparedStatement statementTotalUsers =connection.prepareStatement(TOTAL_USERS);
+            statementTotalUsers.setString(1, search);
+            statementTotalUsers.setString(2, search);
+            statementTotalUsers.setString(3, search);
+           ResultSet rsTotalUser = statementTotalUsers.executeQuery();
+           while (rsTotalUser.next()){
+               double totalUsers = rsTotalUser.getDouble("total");
+               double totalItems = Double.parseDouble(pageable.getTotalItems() + "");
+               int totalPages = (int)
+                       Math.ceil(totalUsers/totalItems);
+               pageable.setTotalPage(totalPages);
+           }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }

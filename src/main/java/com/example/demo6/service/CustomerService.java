@@ -1,6 +1,7 @@
 package com.example.demo6.service;
 
 import com.example.demo6.dao.CustomerDAO;
+import com.example.demo6.dto.Pageable;
 import com.example.demo6.model.Customer;
 import com.example.demo6.model.Role;
 
@@ -33,8 +34,8 @@ public class CustomerService implements BaseCRUDService<Customer>{
     }
 
     @Override
-    public List<Customer> findAll() {
+    public List<Customer> findAll(Pageable pageable) {
         //call xuong database => parse database tra ve thanh list object
-        return customerDAO.findAll();
+        return customerDAO.findAll(pageable);
     }
 }

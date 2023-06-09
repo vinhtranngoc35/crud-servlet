@@ -1,5 +1,7 @@
 package com.example.demo6.service;
 
+import com.example.demo6.dto.Pageable;
+
 import java.util.List;
 
 public interface BaseCRUDService<T>{
@@ -10,5 +12,5 @@ public interface BaseCRUDService<T>{
 
     T findById(int id);
 
-    List<T> findAll();
+    List<T> findAll(Pageable pageable);
 }
