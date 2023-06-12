@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
 
-@WebServlet(name = "customerServlet", urlPatterns = "/customers")
+@WebServlet(name = "customerServlet", urlPatterns = "/admin/customers")
 public class CustomerServlet extends HttpServlet {
 
     private int TOTAL_ITEMS = 5;
