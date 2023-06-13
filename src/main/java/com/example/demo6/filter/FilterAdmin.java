@@ -18,12 +18,13 @@ public class FilterAdmin implements Filter {
         HttpSession session = httpServletRequest.getSession();
 
         String role = (String)session.getAttribute("role");
-
+        //chua co thi dieu huong ve login
         if(role == null){
             HttpServletResponse httpServletResponse = (HttpServletResponse) response;
-            httpServletResponse.sendRedirect("/");
+            httpServletResponse.sendRedirect("");
             return;
         }
+        //bo qua
         chain.doFilter(request, response);
 
 

@@ -19,6 +19,10 @@
   <form action="/customers?action=create" method="post">
     <label for="name">Name</label>
     <input type="text" name="name" id="name" value="${customer.name}" />
+    <label for="email">Username</label>
+    <input type="text" name="username" id="username" value="${customer.username}" />
+    <label for="password">Passwrod</label>
+    <input type="text" name="password" id="password" value="${customer.password}" />
     <label for="email">Email</label>
     <input type="text" name="email" id="email" value="${customer.email}" />
     <label for="role">Role</label>

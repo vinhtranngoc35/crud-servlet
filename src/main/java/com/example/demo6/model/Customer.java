@@ -7,6 +7,10 @@ public class Customer {
 
     private String email;
 
+    private String password;
+
+    private String username;
+
     private Role role;
 
     public Customer() {
@@ -23,10 +27,35 @@ public class Customer {
         this.email = email;
     }
 
+    public Customer(int id, String name, String email, String password, String username, Role role) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.username = username;
+        this.role = role;
+    }
+
     public Customer(String name, String email, Role role) {
         this.name = name;
         this.email = email;
         this.role = role;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public int getId() {

@@ -25,8 +25,13 @@ public class CustomerDAO {
             "ON customers.role_id = " +
             "roles.id where customers.id = ?;";
 
-    private final String INSERT_USER = "INSERT INTO `customers` (`name`, `email`, `role_id`) " +
-            "VALUES (?, ?, ?);";
+    private final String SELECT_USER_BY_USERNAME = "SELECT customers.*, roles.`name` as role_name " +
+            "FROM customers LEFT JOIN roles " +
+            "ON customers.role_id = " +
+            "roles.id where customers.username = ?;";
+
+    private final String INSERT_USER = "INSERT INTO `customers` (`name`, `email`, `role_id`, `username`, `password`) " +
+            "VALUES (?, ?, ?, ?, ?);";
 
     private final String UPDATE_USER = "UPDATE `customers` " +
             "SET `name` = ?, `email` = ?, role_id = ? WHERE (`id` = ?);";
@@ -158,6 +163,37 @@ public class CustomerDAO {
         }
         return null;
     }
+    public Customer findByUsername(String username) {
+        try (Connection connection = getConnection();
+
+             // Step 2: truyền câu lênh mình muốn chạy nằm ở trong này (SELECT_USERS)
+             PreparedStatement preparedStatement = connection
+                     .prepareStatement(SELECT_USER_BY_USERNAME);) {
+            System.out.println(preparedStatement);
+            preparedStatement.setString(1, username);
+
+            // Step 3: tương đương vowis cái sét
+            ResultSet rs = preparedStatement.executeQuery();
+
+            // Step 4:
+            //kiểm tra còn data hay không. còn thì cứ lấy bằng câu lệnh ở dưới
+            while (rs.next()) {
+                //(truyên vào tên cột)
+                int idCus = rs.getInt("id");
+                //(truyên vào tên cột)
+                String name = rs.getString("name");
+                //(truyên vào tên cột)
+                String email = rs.getString("email");
+                String roleName = rs.getString("role_name");
+                String password = rs.getString("password");
+                int roleId = rs.getInt("role_id");
+                return new Customer(idCus, name, email, password, username, new Role(roleId, roleName));
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return null;
+    }
 
     public void insertUser(Customer customer) {
 
@@ -166,6 +202,8 @@ public class CustomerDAO {
             preparedStatement.setString(1, customer.getName());
             preparedStatement.setString(2, customer.getEmail());
             preparedStatement.setInt(3, customer.getRole().getId());
+            preparedStatement.setString(4, customer.getUsername());
+            preparedStatement.setString(5,customer.getPassword());
             System.out.println(preparedStatement);
             preparedStatement.executeUpdate();
         } catch (SQLException e) {

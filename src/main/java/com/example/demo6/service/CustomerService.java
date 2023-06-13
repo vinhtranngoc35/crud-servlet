@@ -38,4 +38,8 @@ public class CustomerService implements BaseCRUDService<Customer>{
         //call xuong database => parse database tra ve thanh list object
         return customerDAO.findAll(pageable);
     }
+
+    public Customer findByUsername(String username){
+        return customerDAO.findByUsername(username);
+    }
 }

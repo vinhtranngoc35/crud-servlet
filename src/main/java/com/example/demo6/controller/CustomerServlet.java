@@ -5,6 +5,7 @@ import com.example.demo6.model.Customer;
 import com.example.demo6.model.Role;
 import com.example.demo6.service.CustomerService;
 import com.example.demo6.service.RoleService;
+import com.example.demo6.ultils.PasswordEncoder;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -52,23 +53,25 @@ public class CustomerServlet extends HttpServlet {
         req.setAttribute("customer",customer);
         req.setAttribute("roles", roleService.findAll());
         req.setAttribute("message", "edited");
-        req.getRequestDispatcher("edit.jsp").forward(req,resp);
+        req.getRequestDispatcher("/edit.jsp").forward(req,resp);
     }
 
 
     private void createCustomer(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String name = req.getParameter("name");
         String mail = req.getParameter("email");
+        String username = req.getParameter("username");
+        String password = PasswordEncoder.encode(req.getParameter("password"));
         int roleId = Integer.parseInt(req.getParameter("role"));
 
         Role role = roleService.findById(roleId);
-        Customer customer = new Customer(name, mail, role);
+        Customer customer = new Customer(0,name, mail,password, username, role);
         customerService.create(customer);
 
         req.setAttribute("customer", customer);
         req.setAttribute("message", "Created");
         req.setAttribute("roles", roleService.findAll());
-        req.getRequestDispatcher("create.jsp").forward(req,resp);
+        req.getRequestDispatcher("/create.jsp").forward(req,resp);
     }
 
     @Override
@@ -106,13 +109,13 @@ public class CustomerServlet extends HttpServlet {
         Customer customer = customerService.findById(id);
         req.setAttribute("customer", customer);
         req.setAttribute("roles", roleService.findAll());
-        req.getRequestDispatcher("edit.jsp")
+        req.getRequestDispatcher("/edit.jsp")
                 .forward(req, resp);
     }
 
     private void showFormCreateCustomer(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.setAttribute("roles", roleService.findAll());
-        req.getRequestDispatcher("create.jsp")
+        req.getRequestDispatcher("/create.jsp")
                 .forward(req,resp);
     }
 
@@ -134,7 +137,7 @@ public class CustomerServlet extends HttpServlet {
         Pageable pageable = new Pageable(search, page, TOTAL_ITEMS , nameField, sortBy);
         req.setAttribute("customers",customerService.findAll(pageable));
         req.setAttribute("pageable", pageable);
-        req.getRequestDispatcher("demo.jsp").forward(req,resp);
+        req.getRequestDispatcher("/demo.jsp").forward(req,resp);
     }
 
 }
